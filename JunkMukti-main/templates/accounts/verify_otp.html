@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP | Waste2Wealth</title>
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'marketplace/css/style.css' %}">
+</head>
+<body>
+
+<div class="auth-container otp-container">
+    <div class="otp-card">
+        <h2>Verify OTP 🔐</h2>
+
+        <p class="otp-info">
+            We’ve sent a <strong>6-digit OTP</strong> to your email.<br>
+            Please enter it below to continue.
+        </p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="alert {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="otp-form">
+            {% csrf_token %}
+
+            <input 
+                type="text"
+                name="otp"
+                placeholder="Enter 6-digit OTP"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                required
+            >
+
+            <button type="submit">Verify OTP</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

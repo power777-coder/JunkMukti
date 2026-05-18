@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Send Message - Waste2Wealth{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: var(--shadow);">
+                <h2 style="font-weight: 700; color: var(--primary-color); margin-bottom: 2rem;">
+                    <i class="fas fa-envelope"></i> Send Message to Seller
+                </h2>
+
+                <div style="background: var(--bg-light); padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h5 style="color: var(--text-dark); margin: 0 0 0.5rem 0;">{{ waste.description|truncatewords:6 }}</h5>
+                    <small style="color: var(--text-light);">
+                        <strong>Seller:</strong> {{ waste.user.first_name|default:waste.user.username }}
+                    </small>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <!-- SUBJECT -->
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                            <i class="fas fa-heading"></i> Subject *
+                        </label>
+                        {{ form.subject }}
+                    </div>
+
+                    <!-- MESSAGE -->
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                            <i class="fas fa-comment"></i> Message *
+                        </label>
+                        {{ form.content }}
+                        <small class="d-block mt-2" style="color: var(--text-light);">Be polite and specific about your inquiry</small>
+                    </div>
+
+                    <!-- BUTTONS -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn" style="background: var(--primary-color); color: white; padding: 1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                        <a href="{% url 'waste_detail' waste.id %}" class="btn" style="background: transparent; color: var(--text-light); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; font-weight: 600; text-decoration: none; text-align: center;">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

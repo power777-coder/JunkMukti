@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Listings - Waste2Wealth{% endblock %}
+
+{% block content %}
+
+<section class="marketplace-section">
+    <div class="container">
+        <h2>My Listings 📦</h2>
+
+        {% if wastes %}
+        <div class="marketplace-grid">
+            {% for waste in wastes %}
+            <div class="marketplace-card">
+              {% if waste.image %}
+    {% cloudinary waste.image width=400 height=250 crop="fill" %}
+{% else %}
+    <img src="{% static 'images/placeholder.jpg' %}">
+{% endif %}
+
+
+
+                <h3>{{ waste.get_waste_type_display }}</h3>
+
+                <p class="waste-info">
+                    Weight: {{ waste.weight_kg }} kg
+                </p>
+
+                <p class="status-badge status-{{ waste.status }}">
+    {{ waste.get_status_display }}
+</p>
+
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p class="empty-text">
+                You haven’t uploaded any waste yet.
+            </p>
+        {% endif %}
+    </div>
+</section>
+
+</body>
+</html>

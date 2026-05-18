@@ -1,0 +1,12 @@
+waste_type,weight_kg,price
+plastic,5,60
+plastic,10,120
+plastic,15,180
+paper,5,40
+paper,10,80
+metal,5,150
+metal,10,300
+glass,5,35
+glass,10,70
+organic,5,10
+organic,10,20

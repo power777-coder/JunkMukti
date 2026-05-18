@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ waste.get_waste_type_display }} - Waste2Wealth{% endblock %}
+
+{% block content %}
+
+<div class="detail-container">
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'marketplace' %}">Marketplace</a></li>
+            <li class="breadcrumb-item active">{{ waste.waste_type|capfirst }}</li>
+        </ol>
+    </nav>
+
+    <!-- MAIN DETAIL -->
+    <div class="detail-grid">
+        <!-- IMAGE -->
+        <div>
+            <div class="detail-image">
+                {% if waste.image %}
+                    <img src="{{ waste.image.url }}" alt="{{ waste.waste_type }}">
+                {% else %}
+                    <div style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f7e0 100%); height: 400px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-image" style="font-size: 5rem; color: var(--primary-light);"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- INFO -->
+        <div>
+            <div class="detail-title">{{ waste.description }}</div>
+            
+            <div class="detail-price">
+                {% if waste.final_price %}
+                    ₹{{ waste.final_price }}
+                {% elif waste.predicted_price %}
+                    🤖 ₹{{ waste.predicted_price }}
+                {% else %}
+                    On Request
+                {% endif %}
+            </div>
+
+            <!-- META INFO -->
+            <div class="detail-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Waste Type</div>
+                    <div class="meta-value">{{ waste.get_waste_type_display }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Weight</div>
+                    <div class="meta-value">{{ waste.weight_kg }} kg</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Category</div>
+                    <div class="meta-value">{{ waste.category }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Location</div>
+                    <div class="meta-value">{{ waste.location }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Posted</div>
+                    <div class="meta-value">{{ waste.created_at|date:"M d, Y" }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Views</div>
+                    <div class="meta-value">{{ waste.views }}</div>
+                </div>
+            </div>
+
+            <!-- SELLER INFO -->
+            <div class="seller-info">
+                <div class="seller-header">
+                    <div class="seller-avatar">{{ waste.user.username|first|upper }}</div>
+                    <div class="seller-details">
+                        <h3>{{ waste.user.first_name|default:waste.user.username }}</h3>
+                        <div class="seller-rating">
+                            <i class="fas fa-star"></i>
+                            <span>Average Rating: 4.5/5 (12 reviews)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="detail-buttons">
+                {% if not is_seller %}
+                    <button class="btn-buy" onclick="window.location.href='{% url 'send_message' waste.id %}';">
+                        <i class="fas fa-envelope"></i> Contact Seller
+                    </button>
+                    <button class="btn-contact" onclick="toggleWishlist();">
+                        <i class="fas fa-heart"></i> {% if is_wishlisted %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
+                    </button>
+                {% else %}
+                    <a href="{% url 'edit_waste' waste.id %}" class="btn-buy" style="text-decoration: none;">
+                        <i class="fas fa-edit"></i> Edit Listing
+                    </a>
+                    <a href="{% url 'delete_waste' waste.id %}" class="btn-contact" style="text-decoration: none; background: var(--danger); color: white; border-color: var(--danger);">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="mt-5 p-4" style="background: var(--bg-light); border-radius: 12px;">
+        <h3 style="font-weight: 700; color: var(--text-dark); margin-bottom: 1rem;">
+            <i class="fas fa-align-left"></i> Description
+        </h3>
+        <p style="line-height: 1.8; color: var(--text-light);">{{ waste.description }}</p>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="reviews-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 style="font-weight: 700; color: var(--text-dark);">
+                <i class="fas fa-comments"></i> Customer Reviews
+            </h3>
+            {% if user.is_authenticated and not is_seller %}
+                <a href="{% url 'add_review' waste.id %}" class="btn" style="background: var(--primary-color); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                    Write a Review
+                </a>
+            {% endif %}
+        </div>
+
+        {% if reviews %}
+            {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <div>
+                            <div class="review-author">{{ review.reviewer.username }}</div>
+                            <div class="review-rating">
+                                {% for i in "12345" %}
+                                    {% if i|add:"0" <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <small class="review-date">{{ review.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    <div class="review-content">{{ review.comment }}</div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No reviews yet. Be the first to review!
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- RELATED ITEMS -->
+    <div class="mt-5">
+        <h3 style="font-weight: 700; color: var(--text-dark); margin-bottom: 2rem;">
+            <i class="fas fa-cube"></i> Similar Items
+        </h3>
+        <div class="marketplace-grid">
+            <!-- Related waste items can be added here -->
+            <div class="alert alert-info" style="grid-column: 1 / -1;">
+                Similar items will be displayed here
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleWishlist() {
+    {% if user.is_authenticated %}
+        fetch(`/waste/{{ waste.id }}/wishlist/{% if is_wishlisted %}remove{% else %}add{% endif %}/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            location.reload();
+        });
+    {% else %}
+        window.location.href = '{% url "login" %}';
+    {% endif %}
+}
+</script>
+
+{% endblock %}

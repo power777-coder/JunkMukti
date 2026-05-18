@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Waste2Wealth{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="hero-text">
+        <h1>♻️ Turn Your Waste Into Money</h1>
+        <p>Sell your waste items, earn rewards, and help the environment. Join thousands of users making a difference.</p>
+        
+        <div class="hero-buttons">
+            <a href="{% url 'marketplace' %}" class="btn-primary">Browse Marketplace</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'upload_waste' %}" class="btn-outline">Upload Waste</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-outline">Start Selling</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- STATS SECTION -->
+<section class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>{{ waste_count }}</h3>
+            <p>Items Listed</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ user_count }}+</h3>
+            <p>Active Users</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ transactions }}</h3>
+            <p>Successful Transactions</p>
+        </div>
+        <div class="stat-card">
+            <h3>♻️</h3>
+            <p>Waste Diverted</p>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED ITEMS -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5" style="font-weight: 700; color: var(--primary-color);">
+            🔥 Recently Listed Items
+        </h2>
+        
+        {% if latest_wastes %}
+            <div class="marketplace-grid">
+                {% for waste in latest_wastes %}
+                    <div class="waste-card">
+                        <div class="waste-card-image">
+                            {% if waste.image %}
+                                <img src="{{ waste.image.url }}" alt="{{ waste.waste_type }}">
+                            {% else %}
+                                <div style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f7e0 100%); height: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-image" style="font-size: 3rem; color: var(--primary-light);"></i>
+                                </div>
+                            {% endif %}
+                            <span class="badge">{{ waste.get_waste_type_display }}</span>
+                        </div>
+                        
+                        <div class="waste-card-body">
+                            <div class="waste-type">{{ waste.category }}</div>
+                            <h3 class="waste-card-title">{{ waste.description|truncatewords:6 }}</h3>
+                            
+                            <div class="waste-info">
+                                <span><i class="fas fa-weight"></i> {{ waste.weight_kg }} kg</span>
+                                <span><i class="fas fa-eye"></i> {{ waste.views }} views</span>
+                            </div>
+                            
+                            <div class="waste-price">
+                                {% if waste.final_price %}
+                                    ₹{{ waste.final_price }}
+                                {% elif waste.predicted_price %}
+                                    🤖 ₹{{ waste.predicted_price }}
+                                {% else %}
+                                    On Request
+                                {% endif %}
+                            </div>
+                            
+                            <div class="waste-actions">
+                                <a href="{% url 'waste_detail' waste.id %}" class="btn-small btn-view">View Details</a>
+                                <button class="btn-small btn-wishlist" onclick="addToWishlist({{ waste.id }})">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'marketplace' %}" class="btn-primary" style="padding: 1rem 2.5rem;">View All Items</a>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                <p>No items available yet. Check back soon!</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+<!-- FEATURES SECTION -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5" style="font-weight: 700; color: var(--primary-color);">
+            Why Choose Waste2Wealth?
+        </h2>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center p-4" style="background: var(--bg-light); border-radius: 12px;">
+                    <i class="fas fa-robot" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                    <h4>AI-Powered Pricing</h4>
+                    <p>Get fair prices using our advanced ML algorithm</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center p-4" style="background: var(--bg-light); border-radius: 12px;">
+                    <i class="fas fa-leaf" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                    <h4>Eco-Friendly</h4>
+                    <p>Help the environment by reducing waste</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center p-4" style="background: var(--bg-light); border-radius: 12px;">
+                    <i class="fas fa-handshake" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                    <h4>Easy Transactions</h4>
+                    <p>Secure and hassle-free buying & selling</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="text-center p-4" style="background: var(--bg-light); border-radius: 12px;">
+                    <i class="fas fa-star" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                    <h4>Ratings & Reviews</h4>
+                    <p>Build trust with community ratings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="py-5" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); color: white;">
+    <div class="container text-center">
+        <h2 style="font-weight: 700; margin-bottom: 1.5rem;">Ready to Make a Difference?</h2>
+        <p style="font-size: 1.1rem; margin-bottom: 2rem;">Start selling your waste today and earn money while helping the planet.</p>
+        
+        {% if user.is_authenticated %}
+            <a href="{% url 'upload_waste' %}" class="btn" style="background: white; color: var(--primary-color); padding: 0.8rem 2rem; font-weight: 600; border-radius: 8px; text-decoration: none;">Upload Your First Item</a>
+        {% else %}
+            <a href="{% url 'signup' %}" class="btn" style="background: white; color: var(--primary-color); padding: 0.8rem 2rem; font-weight: 600; border-radius: 8px; text-decoration: none;">Sign Up Now</a>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+function addToWishlist(wasteId) {
+    {% if user.is_authenticated %}
+        fetch(`/waste/${wasteId}/wishlist/add/`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        });
+    {% else %}
+        window.location.href = '{% url "login" %}';
+    {% endif %}
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up | Waste2Wealth</title>
+    <link rel="stylesheet" href="{% static 'marketplace/css/style.css' %}">
+</head>
+<body class="auth-body">
+
+<div class="auth-container">
+    <h2>Create Account 🌱</h2>
+    <p class="auth-subtext">Join Waste2Wealth and turn waste into money</p>
+
+    <form method="POST">
+    {% csrf_token %}
+
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required>
+
+    <button type="submit">Send OTP</button>
+</form>
+
+    <p class="auth-switch">
+        Already have an account?
+        <a href="{% url 'login' %}">Login</a>
+    </p>
+</div>
+
+</body>
+</html>

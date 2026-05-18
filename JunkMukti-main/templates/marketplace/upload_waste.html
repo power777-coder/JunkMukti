@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Waste - Waste2Wealth{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: var(--shadow);">
+                <div class="text-center mb-4">
+                    <h2 style="font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload Waste
+                    </h2>
+                    <p class="text-muted">List your waste item for sale on our marketplace</p>
+                    <p style="font-size: 0.9rem; color: var(--text-light);">
+                        <i class="fas fa-lightbulb"></i> Tip: Clear images and accurate details get better buyer matches
+                    </p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <!-- WASTE TYPE -->
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                            <i class="fas fa-box"></i> Waste Type *
+                        </label>
+                        {{ form.waste_type }}
+                        {% if form.waste_type.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.waste_type.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- CATEGORY -->
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                            <i class="fas fa-tag"></i> Category *
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.category.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                            <i class="fas fa-align-left"></i> Description *
+                        </label>
+                        {{ form.description }}
+                        <small class="d-block mt-2" style="color: var(--text-light);">Provide detailed information about the waste item</small>
+                        {% if form.description.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- WEIGHT -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                                <i class="fas fa-weight"></i> Weight (kg) *
+                            </label>
+                            {{ form.weight_kg }}
+                            {% if form.weight_kg.errors %}
+                                <div class="alert alert-danger mt-2">{{ form.weight_kg.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- LOCATION -->
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                                <i class="fas fa-map-marker-alt"></i> Location *
+                            </label>
+                            {{ form.location }}
+                            {% if form.location.errors %}
+                                <div class="alert alert-danger mt-2">{{ form.location.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- IMAGE -->
+                    <div class="mb-4">
+                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                            <i class="fas fa-image"></i> Upload Image
+                        </label>
+                        {{ form.image }}
+                        <small class="d-block mt-2" style="color: var(--text-light);">JPG, PNG or GIF (max. 5 MB)</small>
+                        {% if form.image.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.image.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- SUBMIT BUTTON -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn" style="background: var(--primary-color); color: white; padding: 1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 1rem;">
+                            <i class="fas fa-check-circle"></i> Upload & List Item
+                        </button>
+                    </div>
+                </form>
+
+                <!-- INFO BOX -->
+                <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 8px; margin-top: 2rem; border-left: 4px solid var(--primary-color);">
+                    <h5 style="font-weight: 600; color: var(--text-dark); margin-bottom: 1rem;">
+                        <i class="fas fa-info-circle"></i> How Pricing Works
+                    </h5>
+                    <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-light); line-height: 1.8;">
+                        <li>Our AI algorithm suggests a fair market price based on waste type and weight</li>
+                        <li>You can adjust the price as needed</li>
+                        <li>Your listing will be visible to buyers immediately after upload</li>
+                        <li>Updates are instant - modify your listing anytime</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
