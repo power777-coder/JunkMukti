@@ -45,9 +45,10 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 # ALLOWED_HOSTS
 # Set ALLOWED_HOSTS="example.com,localhost" in your environment.
-_allowed_hosts = os.environ.get("ALLOWED_HOSTS", "")
-ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(",") if h.strip()] or []
+# _allowed_hosts = os.environ.get("ALLOWED_HOSTS", "")
+# ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(",") if h.strip()] or []
 
+ALLOWED_HOSTS = ["junkmukti.onrender.com"]
 
 
 # Application definition
