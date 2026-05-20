@@ -1,31 +1,48 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | Waste2Wealth</title>
-    <link rel="stylesheet" href="{% static 'marketplace/css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'marketplace/css/industrial_style.css' %}">
 </head>
-<body class="auth-body">
+<body class="auth-page">
+    <div class="auth-grid">
+        <section class="auth-panel">
+            <span class="auth-badge">Waste2Wealth</span>
+            <h1>Build your waste revenue engine</h1>
+            <p>Sign up to access bidding workflows, connect with nearby buyers, and manage your recycle storefront.</p>
+            <div class="auth-features">
+                <div><i class="fas fa-robot"></i> AI pricing</div>
+                <div><i class="fas fa-truck"></i> Local pickup</div>
+                <div><i class="fas fa-tachometer-alt"></i> Real-time status</div>
+            </div>
+        </section>
 
-<div class="auth-container">
-    <h2>Create Account 🌱</h2>
-    <p class="auth-subtext">Join Waste2Wealth and turn waste into money</p>
+        <section class="auth-card">
+            <div class="auth-card-header">
+                <h2>Create account</h2>
+                <p>Get started with a faster onboarding flow for sellers and buyers.</p>
+            </div>
 
-    <form method="POST">
-    {% csrf_token %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
 
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Password" required>
+            <form method="POST" class="auth-form">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="email" name="email" placeholder="Email address" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Send OTP</button>
+            </form>
 
-    <button type="submit">Send OTP</button>
-</form>
-
-    <p class="auth-switch">
-        Already have an account?
-        <a href="{% url 'login' %}">Login</a>
-    </p>
-</div>
-
+            <p class="auth-switch">Already registered? <a href="{% url 'login' %}">Login</a></p>
+        </section>
+    </div>
 </body>
 </html>

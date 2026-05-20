@@ -3,44 +3,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP | Waste2Wealth</title>
-
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="{% static 'marketplace/css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'marketplace/css/industrial_style.css' %}">
 </head>
-<body>
+<body class="auth-page">
+    <div class="auth-grid otp-grid">
+        <section class="auth-panel">
+            <span class="auth-badge">Waste2Wealth</span>
+            <h1>OTP verification</h1>
+            <p>Complete your secure sign-up by entering the code sent to your email.</p>
+            <div class="auth-features">
+                <div><i class="fas fa-shield-alt"></i> Secure access</div>
+                <div><i class="fas fa-bolt"></i> Fast onboarding</div>
+                <div><i class="fas fa-check-circle"></i> Verified accounts</div>
+            </div>
+        </section>
 
-<div class="auth-container otp-container">
-    <div class="otp-card">
-        <h2>Verify OTP 🔐</h2>
+        <section class="auth-card">
+            <div class="auth-card-header">
+                <h2>Verify your account</h2>
+                <p>Enter the 6-digit OTP from your inbox.</p>
+            </div>
 
-        <p class="otp-info">
-            We’ve sent a <strong>6-digit OTP</strong> to your email.<br>
-            Please enter it below to continue.
-        </p>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
 
-        {% if messages %}
-            {% for message in messages %}
-                <p class="alert {{ message.tags }}">{{ message }}</p>
-            {% endfor %}
-        {% endif %}
+            <form method="POST" class="otp-form">
+                {% csrf_token %}
+                <input type="text" name="otp" placeholder="Enter 6-digit OTP" maxlength="6" pattern="[0-9]{6}" required>
+                <button type="submit">Verify OTP</button>
+            </form>
 
-        <form method="POST" class="otp-form">
-            {% csrf_token %}
-
-            <input 
-                type="text"
-                name="otp"
-                placeholder="Enter 6-digit OTP"
-                maxlength="6"
-                pattern="[0-9]{6}"
-                required
-            >
-
-            <button type="submit">Verify OTP</button>
-        </form>
+            <p class="auth-switch">Need a new code? <a href="{% url 'signup' %}">Restart sign up</a></p>
+        </section>
     </div>
-</div>
-
 </body>
 </html>

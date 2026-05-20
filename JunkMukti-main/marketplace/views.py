@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden
-from django.db.models import Q
+from django.db.models import Q, Count
+from django.utils import timezone
 from django.contrib import messages as django_messages
-from .forms import WasteForm, ReviewForm, MessageForm, WasteFilterForm
-from .models import Waste, WishlistItem, Review, Message, Transaction
+from django.contrib.auth.models import User
+from .forms import WasteForm, ReviewForm, MessageForm, WasteFilterForm, BidForm
+from .models import Waste, WishlistItem, Review, Message, Transaction, Bid
 from .ml_pricing import predict_price
 
 
@@ -40,12 +42,19 @@ def waste_detail(request, waste_id):
     if request.user.is_authenticated:
         wishlist_item = WishlistItem.objects.filter(user=request.user, waste=waste).exists()
     
+    bid_form = BidForm()
+    bids = waste.bids.filter(status='pending').select_related('bidder')
+    highest_bid = waste.bids.filter(status='pending').order_by('-amount').first()
+
     context = {
         'waste': waste,
         'reviews': reviews,
         'average_rating': average_rating,
         'is_wishlisted': wishlist_item,
-        'is_seller': waste.user == request.user
+        'is_seller': waste.user == request.user,
+        'bids': bids,
+        'highest_bid': highest_bid,
+        'bid_form': bid_form
     }
     return render(request, 'marketplace/waste_detail.html', context)
 
@@ -285,6 +294,132 @@ def user_profile(request, user_id):
     return render(request, 'marketplace/user_profile.html', context)
 
 
+@login_required
+def request_purchase(request, waste_id):
+    waste = get_object_or_404(Waste, id=waste_id, status='available')
+    if waste.user == request.user:
+        django_messages.error(request, "You can't request your own item.")
+        return redirect('waste_detail', waste_id=waste_id)
+
+    transaction, created = Transaction.objects.get_or_create(
+        waste=waste,
+        buyer=request.user,
+        seller=waste.user,
+        defaults={
+            'amount': waste.final_price or waste.predicted_price or 0,
+            'status': 'pending'
+        }
+    )
+
+    if not created and transaction.status == 'pending':
+        django_messages.info(request, 'You already requested to purchase this item. Seller will respond soon.')
+    elif transaction.status != 'pending':
+        django_messages.warning(request, 'This item is already in progress or sold.')
+    else:
+        django_messages.success(request, 'Purchase request sent to the seller.')
+
+    return redirect('waste_detail', waste_id=waste_id)
+
+
+@login_required
+def mark_sold(request, waste_id):
+    waste = get_object_or_404(Waste, id=waste_id, user=request.user)
+    if waste.status != 'available':
+        django_messages.error(request, 'This item cannot be marked as sold.')
+        return redirect('dashboard')
+
+    waste.status = 'sold'
+    waste.save()
+
+    Transaction.objects.filter(waste=waste, status='pending').update(
+        status='completed',
+        completed_at=timezone.now()
+    )
+
+    django_messages.success(request, 'Listing marked as sold and related requests completed.')
+    return redirect('dashboard')
+
+
+@login_required
+def place_bid(request, waste_id):
+    waste = get_object_or_404(Waste, id=waste_id, status='available')
+    if waste.user == request.user:
+        django_messages.error(request, "You can't bid on your own item.")
+        return redirect('waste_detail', waste_id=waste_id)
+
+    if request.method == 'POST':
+        form = BidForm(request.POST)
+        if form.is_valid():
+            amount = form.cleaned_data['amount']
+            Bid.objects.create(
+                waste=waste,
+                bidder=request.user,
+                amount=amount,
+                status='pending'
+            )
+            django_messages.success(request, 'Your bid has been submitted. Sellers will review it soon.')
+        else:
+            django_messages.error(request, 'Enter a valid bid amount.')
+
+    return redirect('waste_detail', waste_id=waste_id)
+
+
+@login_required
+def accept_bid(request, waste_id, bid_id):
+    waste = get_object_or_404(Waste, id=waste_id, user=request.user)
+    bid = get_object_or_404(Bid, id=bid_id, waste=waste)
+
+    if waste.status != 'available':
+        django_messages.error(request, 'This listing is no longer available.')
+        return redirect('waste_detail', waste_id=waste_id)
+
+    bid.status = 'accepted'
+    bid.save()
+    waste.status = 'sold'
+    waste.final_price = bid.amount
+    waste.save()
+
+    Transaction.objects.create(
+        waste=waste,
+        buyer=bid.bidder,
+        seller=request.user,
+        amount=bid.amount,
+        status='completed',
+        completed_at=timezone.now()
+    )
+
+    Bid.objects.filter(waste=waste).exclude(id=bid.id).update(status='rejected')
+    django_messages.success(request, 'Bid accepted and sale completed.')
+    return redirect('dashboard')
+
+
+def nearby(request):
+    location_query = request.GET.get('location', '')
+    near_listings = Waste.objects.filter(status='available')
+
+    if location_query:
+        near_listings = near_listings.filter(location__icontains=location_query)
+    else:
+        near_listings = near_listings.order_by('-created_at')[:10]
+
+    locations = Waste.objects.filter(status='available').values('location').annotate(count=Count('id')).order_by('-count')[:5]
+
+    return render(request, 'marketplace/nearby.html', {
+        'near_listings': near_listings,
+        'location_query': location_query,
+        'locations': locations,
+    })
+
+
+@login_required
+def transactions(request):
+    transactions = Transaction.objects.filter(
+        Q(buyer=request.user) | Q(seller=request.user)
+    ).select_related('waste', 'buyer', 'seller').order_by('-created_at')
+
+    return render(request, 'marketplace/transactions.html', {'transactions': transactions})
+
+
 # Dashboard
 @login_required
 def dashboard(request):
@@ -296,13 +431,34 @@ def dashboard(request):
     recent_reviews = Review.objects.filter(waste__user=request.user).order_by('-created_at')[:5]
     unread_messages = Message.objects.filter(recipient=request.user, is_read=False).count()
     
+    pending_requests = Transaction.objects.filter(seller=request.user, status='pending').count()
+    completed_transactions = Transaction.objects.filter(
+        Q(buyer=request.user) | Q(seller=request.user),
+        status='completed'
+    ).count()
+    recent_transactions = Transaction.objects.filter(
+        Q(buyer=request.user) | Q(seller=request.user)
+    ).order_by('-created_at')[:5]
+
+    bid_requests = Bid.objects.filter(waste__user=request.user, status='pending').count()
+    top_categories = Waste.objects.filter(status='available').values('category').annotate(count=Count('id')).order_by('-count')[:5]
+    chart_data = {
+        'categories': [item['category'] for item in top_categories],
+        'counts': [item['count'] for item in top_categories]
+    }
+
     context = {
         'sold_items': sold_items,
         'active_items': active_items,
         'total_revenue': total_revenue,
         'recent_reviews': recent_reviews,
         'unread_messages': unread_messages,
-        'user_wastes': user_wastes.order_by('-created_at')[:5]
+        'pending_requests': pending_requests,
+        'completed_transactions': completed_transactions,
+        'recent_transactions': recent_transactions,
+        'user_wastes': user_wastes.order_by('-created_at')[:5],
+        'bid_requests': bid_requests,
+        'chart_data': chart_data,
     }
     return render(request, 'marketplace/dashboard.html', context)
 

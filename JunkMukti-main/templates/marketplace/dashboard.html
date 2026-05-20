@@ -8,7 +8,7 @@
 <div class="dashboard-container">
     <!-- HEADER -->
     <div class="mb-5">
-        <h1 style="font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;">
+        <h1 class="page-title">
             <i class="fas fa-chart-line"></i> Dashboard
         </h1>
         <p class="text-muted">Welcome back, <strong>{{ user.first_name|default:user.username }}</strong>!</p>
@@ -29,21 +29,46 @@
             <div class="value">₹{{ total_revenue|floatformat:0 }}</div>
         </div>
         <div class="dashboard-card">
+            <h3><i class="fas fa-handshake"></i> Pending Requests</h3>
+            <div class="value">{{ pending_requests }}</div>
+        </div>
+        <div class="dashboard-card">
+            <h3><i class="fas fa-arrow-right"></i> Completed Transactions</h3>
+            <div class="value">{{ completed_transactions }}</div>
+        </div>
+        <div class="dashboard-card">
             <h3><i class="fas fa-envelope"></i> Messages</h3>
             <div class="value">{{ unread_messages }}</div>
         </div>
+        <div class="dashboard-card">
+            <h3><i class="fas fa-gavel"></i> Bid Requests</h3>
+            <div class="value">{{ bid_requests }}</div>
+        </div>
+    </div>
+
+    <!-- ANALYTICS PANEL -->
+    <div class="analytics-panel mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-2" style="font-size: 1.4rem; color: #f8fafc;">
+                    <i class="fas fa-chart-bar"></i> Marketplace Trend Pulse
+                </h3>
+                <p class="text-muted mb-0" style="max-width: 620px;">Track category demand and see which waste streams are driving activity today.</p>
+            </div>
+        </div>
+        <canvas id="dashboardChart" height="130"></canvas>
     </div>
 
     <!-- MAIN CONTENT -->
     <div class="row mt-5">
         <!-- MY LISTINGS -->
         <div class="col-lg-8">
-            <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: var(--shadow);">
+            <div class="card card-soft">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 style="font-weight: 700; color: var(--text-dark);">
+                    <h3 style="font-weight: 700; color: white;">
                         <i class="fas fa-list-ul"></i> My Recent Listings
                     </h3>
-                    <a href="{% url 'upload_waste' %}" class="btn" style="background: var(--primary-color); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                    <a href="{% url 'upload_waste' %}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> New Listing
                     </a>
                 </div>
@@ -51,7 +76,7 @@
                 {% if user_wastes %}
                     <div class="table-responsive">
                         <table class="table">
-                            <thead style="background: var(--bg-light);">
+                            <thead>
                                 <tr>
                                     <th>Item</th>
                                     <th>Type</th>
@@ -102,8 +127,8 @@
         <!-- SIDEBAR -->
         <div class="col-lg-4">
             <!-- RECENT REVIEWS -->
-            <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 2rem;">
-                <h4 style="font-weight: 700; color: var(--text-dark); margin-bottom: 1.5rem;">
+            <div class="card card-soft mb-4">
+                <h4 style="font-weight: 700; color: white; margin-bottom: 1.5rem;">
                     <i class="fas fa-star"></i> Recent Reviews
                 </h4>
 
@@ -127,8 +152,8 @@
             </div>
 
             <!-- QUICK ACTIONS -->
-            <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: var(--shadow);">
-                <h4 style="font-weight: 700; color: var(--text-dark); margin-bottom: 1.5rem;">
+            <div class="card card-soft">
+                <h4 style="font-weight: 700; color: white; margin-bottom: 1.5rem;">
                     <i class="fas fa-bolt"></i> Quick Actions
                 </h4>
 
@@ -149,6 +174,89 @@
             </div>
         </div>
     </div>
+
+    <!-- RECENT TRANSACTIONS -->
+    <div class="mt-5" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: var(--shadow);">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 style="font-weight: 700; color: var(--text-dark);">
+                <i class="fas fa-list-alt"></i> Recent Transactions
+            </h3>
+            <a href="{% url 'transactions' %}" class="btn" style="background: var(--info); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                View All
+            </a>
+        </div>
+        {% if recent_transactions %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead style="background: var(--bg-light);">
+                        <tr>
+                            <th>Waste</th>
+                            <th>Buyer</th>
+                            <th>Seller</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Requested</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for txn in recent_transactions %}
+                            <tr>
+                                <td>{{ txn.waste.description|truncatewords:4 }}</td>
+                                <td>{{ txn.buyer.username }}</td>
+                                <td>{{ txn.seller.username }}</td>
+                                <td>₹{{ txn.amount|floatformat:0 }}</td>
+                                <td>{{ txn.get_status_display }}</td>
+                                <td>{{ txn.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">No recent transactions available yet.</div>
+        {% endif %}
+    </div>
+        </div>
+    </div>
+
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const chartLabels = {{ chart_data.categories|safe }};
+const chartValues = {{ chart_data.counts|safe }};
+const ctx = document.getElementById('dashboardChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: chartLabels,
+        datasets: [{
+            label: 'Active listings by category',
+            data: chartValues,
+            backgroundColor: 'rgba(56, 189, 248, 0.6)',
+            borderColor: 'rgba(56, 189, 248, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.08)' },
+                ticks: { color: '#e2e8f0' }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { color: '#e2e8f0' }
+            }
+        }
+    }
+});
+</script>
 
 {% endblock %}

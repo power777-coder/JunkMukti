@@ -7,17 +7,19 @@
 
 <!-- HERO SECTION -->
 <section class="hero">
-    <div class="hero-text">
-        <h1>♻️ Turn Your Waste Into Money</h1>
-        <p>Sell your waste items, earn rewards, and help the environment. Join thousands of users making a difference.</p>
-        
-        <div class="hero-buttons">
-            <a href="{% url 'marketplace' %}" class="btn-primary">Browse Marketplace</a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'upload_waste' %}" class="btn-outline">Upload Waste</a>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn-outline">Start Selling</a>
-            {% endif %}
+    <div class="hero-grid">
+        <div class="hero-copy">
+            <span class="hero-badge">Industrial Marketplace</span>
+            <h1>♻️ Turn Your Waste Into Money</h1>
+            <p>Sell your waste items, earn rewards, and help the environment. Join thousands of users making a difference.</p>
+            <div class="hero-buttons">
+                <a href="{% url 'marketplace' %}" class="btn btn-primary">Browse Marketplace</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'upload_waste' %}" class="btn btn-outline">Upload Waste</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline">Start Selling</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </section>
@@ -118,31 +120,31 @@
                 <div class="text-center p-4" style="background: var(--bg-light); border-radius: 12px;">
                     <i class="fas fa-robot" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
                     <h4>AI-Powered Pricing</h4>
-                    <p>Get fair prices using our advanced ML algorithm</p>
+                    <p>Get optimized offers based on smart waste valuation.</p>
                 </div>
             </div>
             
             <div class="col-md-6 col-lg-3">
                 <div class="text-center p-4" style="background: var(--bg-light); border-radius: 12px;">
-                    <i class="fas fa-leaf" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
-                    <h4>Eco-Friendly</h4>
-                    <p>Help the environment by reducing waste</p>
+                    <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                    <h4>Nearby Connections</h4>
+                    <p>Find local buyers and sellers with fast pickup options.</p>
                 </div>
             </div>
             
             <div class="col-md-6 col-lg-3">
                 <div class="text-center p-4" style="background: var(--bg-light); border-radius: 12px;">
-                    <i class="fas fa-handshake" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
-                    <h4>Easy Transactions</h4>
-                    <p>Secure and hassle-free buying & selling</p>
+                    <i class="fas fa-gavel" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                    <h4>Live Bidding</h4>
+                    <p>Submit and accept competitive offers before selling.</p>
                 </div>
             </div>
             
             <div class="col-md-6 col-lg-3">
                 <div class="text-center p-4" style="background: var(--bg-light); border-radius: 12px;">
-                    <i class="fas fa-star" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
-                    <h4>Ratings & Reviews</h4>
-                    <p>Build trust with community ratings</p>
+                    <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                    <h4>Analytics Dashboard</h4>
+                    <p>Track listings, revenue, and transactions at a glance.</p>
                 </div>
             </div>
         </div>

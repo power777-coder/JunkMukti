@@ -74,6 +74,18 @@ class MessageForm(forms.ModelForm):
         }
 
 
+class BidForm(forms.Form):
+    amount = forms.FloatField(
+        required=True,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your bid amount',
+            'step': '0.01',
+            'min': '0'
+        })
+    )
+
+
 class WasteFilterForm(forms.Form):
     waste_type = forms.ChoiceField(
         required=False,

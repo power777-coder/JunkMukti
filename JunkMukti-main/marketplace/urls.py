@@ -2,7 +2,9 @@ from django.urls import path
 from .views import (
     home, upload_waste, marketplace, my_listings, waste_detail,
     edit_waste, delete_waste, add_to_wishlist, remove_from_wishlist,
-    wishlist, add_review, send_message, inbox, user_profile, dashboard
+    wishlist, add_review, send_message, request_purchase, mark_sold,
+    inbox, user_profile, dashboard, transactions,
+    place_bid, accept_bid, nearby
 )
 
 urlpatterns = [
@@ -18,6 +20,12 @@ urlpatterns = [
     path('wishlist/', wishlist, name='wishlist'),
     path('waste/<int:waste_id>/review/', add_review, name='add_review'),
     path('waste/<int:waste_id>/message/', send_message, name='send_message'),
+    path('waste/<int:waste_id>/request-purchase/', request_purchase, name='request_purchase'),
+    path('waste/<int:waste_id>/place-bid/', place_bid, name='place_bid'),
+    path('waste/<int:waste_id>/accept-bid/<int:bid_id>/', accept_bid, name='accept_bid'),
+    path('waste/<int:waste_id>/mark-sold/', mark_sold, name='mark_sold'),
+    path('transactions/', transactions, name='transactions'),
+    path('nearby/', nearby, name='nearby'),
     path('inbox/', inbox, name='inbox'),
     path('user/<int:user_id>/', user_profile, name='user_profile'),
     path('dashboard/', dashboard, name='dashboard'),

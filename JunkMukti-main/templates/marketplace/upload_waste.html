@@ -8,13 +8,13 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: var(--shadow);">
+            <div class="card card-soft">
                 <div class="text-center mb-4">
-                    <h2 style="font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;">
+                    <h2 class="mb-2" style="font-weight: 700; color: var(--accent);">
                         <i class="fas fa-cloud-upload-alt"></i> Upload Waste
                     </h2>
                     <p class="text-muted">List your waste item for sale on our marketplace</p>
-                    <p style="font-size: 0.9rem; color: var(--text-light);">
+                    <p class="text-muted small">
                         <i class="fas fa-lightbulb"></i> Tip: Clear images and accurate details get better buyer matches
                     </p>
                 </div>
@@ -30,7 +30,7 @@
 
                     <!-- WASTE TYPE -->
                     <div class="mb-4">
-                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                        <label class="form-label">
                             <i class="fas fa-box"></i> Waste Type *
                         </label>
                         {{ form.waste_type }}
@@ -41,7 +41,7 @@
 
                     <!-- CATEGORY -->
                     <div class="mb-4">
-                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                        <label class="form-label">
                             <i class="fas fa-tag"></i> Category *
                         </label>
                         {{ form.category }}
@@ -52,7 +52,7 @@
 
                     <!-- DESCRIPTION -->
                     <div class="mb-4">
-                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                        <label class="form-label">
                             <i class="fas fa-align-left"></i> Description *
                         </label>
                         {{ form.description }}
@@ -65,7 +65,7 @@
                     <!-- WEIGHT -->
                     <div class="row">
                         <div class="col-md-6 mb-4">
-                            <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                            <label class="form-label">
                                 <i class="fas fa-weight"></i> Weight (kg) *
                             </label>
                             {{ form.weight_kg }}
@@ -76,7 +76,7 @@
 
                         <!-- LOCATION -->
                         <div class="col-md-6 mb-4">
-                            <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                            <label class="form-label">
                                 <i class="fas fa-map-marker-alt"></i> Location *
                             </label>
                             {{ form.location }}
@@ -88,7 +88,7 @@
 
                     <!-- IMAGE -->
                     <div class="mb-4">
-                        <label class="form-label" style="font-weight: 600; color: var(--text-dark);">
+                        <label class="form-label">
                             <i class="fas fa-image"></i> Upload Image
                         </label>
                         {{ form.image }}
@@ -100,18 +100,18 @@
 
                     <!-- SUBMIT BUTTON -->
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn" style="background: var(--primary-color); color: white; padding: 1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 1rem;">
+                        <button type="submit" class="btn btn-primary">
                             <i class="fas fa-check-circle"></i> Upload & List Item
                         </button>
                     </div>
                 </form>
 
                 <!-- INFO BOX -->
-                <div style="background: var(--bg-light); padding: 1.5rem; border-radius: 8px; margin-top: 2rem; border-left: 4px solid var(--primary-color);">
-                    <h5 style="font-weight: 600; color: var(--text-dark); margin-bottom: 1rem;">
+                <div class="info-box mt-4">
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">
                         <i class="fas fa-info-circle"></i> How Pricing Works
                     </h5>
-                    <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-light); line-height: 1.8;">
+                    <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
                         <li>Our AI algorithm suggests a fair market price based on waste type and weight</li>
                         <li>You can adjust the price as needed</li>
                         <li>Your listing will be visible to buyers immediately after upload</li>

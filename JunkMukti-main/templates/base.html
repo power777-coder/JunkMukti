@@ -13,72 +13,108 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'marketplace/css/modern_style.css' %}">
+    <link rel="stylesheet" href="{% static 'marketplace/css/industrial_style.css' %}">
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="app-shell">
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fas fa-recycle"></i> Waste2Wealth
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+    <!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+
+        <!-- Logo -->
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="fas fa-recycle"></i> Waste2Wealth
+        </a>
+
+        <!-- Right Side -->
+        <div class="d-flex align-items-center ms-auto gap-3">
+
+            {% if user.is_authenticated %}
+
+            <!-- User Profile -->
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-2"
+                   href="#"
+                   id="userDropdown"
+                   role="button"
+                   data-bs-toggle="dropdown">
+
+                    <i class="fas fa-user-circle fs-5"></i>
+                    <span>{{ user.username }}</span>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                    <li>
+                        <a class="dropdown-item"
+                           href="{% url 'user_profile' user.id %}">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'marketplace' %}">Marketplace</a>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li>
+                        <a class="dropdown-item"
+                           href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
                     </li>
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'my_listings' %}">My Listings</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'upload_waste' %}">Upload</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'inbox' %}">
-                                <i class="fas fa-envelope"></i> Messages
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'wishlist' %}">
-                                <i class="fas fa-heart"></i> Wishlist
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle"></i> {{ user.username }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{% url 'user_profile' user.id %}">Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
-                        </li>
-                    {% endif %}
                 </ul>
             </div>
+
+            {% endif %}
+
+            <!-- Hamburger Menu -->
+            <button class="btn btn-dark border-0 shadow-none"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#sidebarMenu"
+                    aria-controls="sidebarMenu">
+
+                <i class="fas fa-bars fs-4 text-white"></i>
+
+            </button>
+
         </div>
-    </nav>
+    </div>
+</nav>
+
+    <div class="offcanvas offcanvas-start sidebar-offcanvas" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarMenuLabel"><i class="fas fa-recycle"></i> Waste2Wealth</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="navbar-nav sidebar-nav">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'marketplace' %}">Marketplace</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'nearby' %}">Nearby</a></li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'my_listings' %}">My Listings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'upload_waste' %}">Upload</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'inbox' %}"><i class="fas fa-envelope"></i> Messages</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'transactions' %}"><i class="fas fa-handshake"></i> Transactions</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="{% url 'user_profile' user.id %}">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
 
     <!-- MESSAGES -->
     {% if messages %}

@@ -48,8 +48,8 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 # _allowed_hosts = os.environ.get("ALLOWED_HOSTS", "")
 # ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(",") if h.strip()] or []
 
-ALLOWED_HOSTS = ["junkmukti.onrender.com"]
-
+# ALLOWED_HOSTS = ["junkmukti.onrender.com"]
+ALLOWED_HOSTS = ["*"]  # Allow all hosts (not recommended for production, but simplifies deployment on Render)
 
 # Application definition
 

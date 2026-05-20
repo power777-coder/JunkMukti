@@ -151,3 +151,23 @@ class Transaction(models.Model):
     
     def __str__(self):
         return f"Transaction {self.id} - {self.waste.waste_type}"
+
+
+class Bid(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+
+    waste = models.ForeignKey(Waste, on_delete=models.CASCADE, related_name='bids')
+    bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids')
+    amount = models.FloatField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Bid {self.id} - {self.waste.waste_type} by {self.bidder.username}"

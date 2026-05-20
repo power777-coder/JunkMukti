@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nearby Listings - Waste2Wealth{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="mb-5 text-center">
+        <h1 class="page-title">Nearby Connect</h1>
+        <p class="text-muted">Discover nearby sellers and waste buyers by location, then connect instantly.</p>
+    </div>
+
+    <form method="get" class="row g-3 justify-content-center mb-4">
+        <div class="col-md-6">
+            <input type="text" class="form-control" name="location" value="{{ location_query }}" placeholder="Search by city, district, or area">
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">Search Nearby</button>
+        </div>
+    </form>
+
+    <div class="row">
+        <div class="col-lg-8">
+            {% if near_listings %}
+                <div class="marketplace-grid">
+                    {% for waste in near_listings %}
+                        <div class="marketplace-card">
+                            <div class="card-header">
+                                <span class="badge">{{ waste.category }}</span>
+                                <span class="status-badge status-{{ waste.status }}">{{ waste.get_status_display }}</span>
+                            </div>
+                            <div class="card-body">
+                                <h3>{{ waste.description|truncatewords:7 }}</h3>
+                                <p>{{ waste.location }} • {{ waste.weight_kg }}kg</p>
+                                <div class="price">₹{{ waste.final_price|default:"On Request" }}</div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'waste_detail' waste.id %}" class="btn btn-outline-light">View Offer</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">No nearby listings found. Try a broader location or explore the marketplace.</div>
+            {% endif %}
+        </div>
+        <div class="col-lg-4">
+            <div class="sidebar-panel">
+                <h4>Top Active Locations</h4>
+                <ul class="list-unstyled">
+                    {% for item in locations %}
+                        <li class="mb-3">
+                            <strong>{{ item.location }}</strong>
+                            <div class="text-muted">{{ item.count }} active listings</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="mt-4" style="background: rgba(255,255,255,0.04); padding: 1rem; border-radius: 12px;">
+                    <h5>Why Nearby Matters</h5>
+                    <p class="text-muted">Reduce transport cost, accelerate pickups, and build stronger local supply chains.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

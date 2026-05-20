@@ -95,6 +95,13 @@
                     <button class="btn-contact" onclick="toggleWishlist();">
                         <i class="fas fa-heart"></i> {% if is_wishlisted %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
                     </button>
+                    {% if waste.status == 'available' %}
+                        <a href="{% url 'request_purchase' waste.id %}" class="btn-buy" style="text-decoration: none;">
+                            <i class="fas fa-hand-holding-heart"></i> Request Purchase
+                        </a>
+                    {% else %}
+                        <span class="status-badge status-{{ waste.status }}">{{ waste.get_status_display }}</span>
+                    {% endif %}
                 {% else %}
                     <a href="{% url 'edit_waste' waste.id %}" class="btn-buy" style="text-decoration: none;">
                         <i class="fas fa-edit"></i> Edit Listing
@@ -102,9 +109,67 @@
                     <a href="{% url 'delete_waste' waste.id %}" class="btn-contact" style="text-decoration: none; background: var(--danger); color: white; border-color: var(--danger);">
                         <i class="fas fa-trash"></i> Delete
                     </a>
+                    {% if waste.status == 'available' %}
+                        <a href="{% url 'mark_sold' waste.id %}" class="btn-contact" style="text-decoration: none;">
+                            <i class="fas fa-check-circle"></i> Mark as Sold
+                        </a>
+                    {% else %}
+                        <span class="status-badge status-{{ waste.status }}">{{ waste.get_status_display }}</span>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
+    </div>
+
+    <!-- BIDS PANEL -->
+    <div class="mt-5 p-4" style="background: rgba(16, 22, 32, 0.92); border-radius: 16px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 style="font-weight: 700; color: #f3f6fb; margin-bottom: 0.25rem;">
+                    <i class="fas fa-gavel"></i> Bidding & Offers
+                </h3>
+                <p style="color: #cbd5e1; margin: 0;">View live bids or submit your best offer.</p>
+            </div>
+            {% if highest_bid %}
+                <div style="color: #c3f6c2; font-weight: 700;">
+                    Highest Bid: ₹{{ highest_bid.amount }}
+                </div>
+            {% endif %}
+        </div>
+
+        {% if user.is_authenticated and not is_seller and waste.status == 'available' %}
+            <form method="post" action="{% url 'place_bid' waste.id %}" class="bid-form">
+                {% csrf_token %}
+                <div class="grid-2 gap-2" style="align-items: end;">
+                    {{ bid_form.amount }}
+                    <button type="submit" class="btn-buy" style="width: 100%;">Place Bid</button>
+                </div>
+            </form>
+        {% elif not user.is_authenticated %}
+            <div class="alert alert-warning" style="background: rgba(255, 255, 255, 0.08); color: #e2e8f0;">
+                <i class="fas fa-lock"></i> Login to place a bid and connect with sellers.
+            </div>
+        {% endif %}
+
+        {% if bids %}
+            <div class="bids-list mt-4">
+                {% for bid in bids %}
+                    <div class="bid-row">
+                        <div>
+                            <strong>{{ bid.bidder.username }}</strong> offered <span class="text-primary">₹{{ bid.amount }}</span>
+                            <div class="text-muted">{{ bid.created_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                        {% if is_seller %}
+                            <a href="{% url 'accept_bid' waste.id bid.id %}" class="btn-buy" style="padding: 0.5rem 1rem;">Accept</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-secondary" style="background: rgba(255,255,255,0.06); color: #cbd5e1;">
+                No bids yet. Be the first to make an offer.
+            </div>
+        {% endif %}
     </div>
 
     <!-- DESCRIPTION -->
